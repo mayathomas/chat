@@ -1,6 +1,7 @@
 mod config;
 mod error;
 mod handlers;
+mod middleware;
 mod models;
 mod utils;
 
@@ -18,8 +19,10 @@ use handlers::{
     list_message_handler, send_message_handler, signin_handler, signup_handler,
     update_chat_handler,
 };
+use middleware::set_layer;
 pub use models::User;
 use sqlx::PgPool;
+
 use utils::{DecodingKey, EncodingKey};
 
 #[derive(Debug, Clone)]
@@ -81,10 +84,13 @@ pub async fn get_router(config: AppConfig) -> Result<Router, AppError> {
                 .post(send_message_handler),
         )
         .route("/chat/:id/messages", get(list_message_handler));
-    Ok(Router::new()
+
+    let app = Router::new()
         .route("/", get(index_handler))
         .nest("/api", api)
-        .with_state(state))
+        .with_state(state);
+    let app = set_layer(app);
+    Ok(app)
 }
 
 #[cfg(test)]
