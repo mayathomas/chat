@@ -1,5 +1,7 @@
 mod config;
+mod error;
 mod handlers;
+mod models;
 
 use std::{ops::Deref, sync::Arc};
 
@@ -8,11 +10,13 @@ use axum::{
     Router,
 };
 pub use config::AppConfig;
+pub use error::AppError;
 use handlers::{
     create_chat_handler, delete_chat_handler, index_handler, list_chat_handler,
     list_message_handler, send_message_handler, signin_handler, signup_handler,
     update_chat_handler,
 };
+pub use models::User;
 
 #[derive(Debug, Clone)]
 pub(crate) struct AppState {
