@@ -1,0 +1,28 @@
+### signup user
+POST http://localhost:6688/api/signup
+Content-Type: application/json
+
+{
+    "fullname": "maya",
+    "email": "maya@qq.com",
+    "password": "2713"
+}
+
+### signin user(valid)
+POST http://localhost:6688/api/signin
+Content-Type: application/json
+
+{
+    "email": "maya@qq.com",
+    "password": "2713"
+}
+
+
+### signin user(invalid)
+POST http://localhost:6688/api/signin
+Content-Type: application/json
+
+{
+    "email": "maya1@qq.com",
+    "password": "2713"
+}
