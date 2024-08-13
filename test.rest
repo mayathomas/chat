@@ -3,6 +3,7 @@ POST http://localhost:6688/api/signup
 Content-Type: application/json
 
 {
+    "workspace": "rust",
     "fullname": "maya",
     "email": "maya@qq.com",
     "password": "2713"
@@ -32,5 +33,10 @@ Content-Type: application/json
 ### get chat list
 @token = {{signin.response.body.token}}
 GET http://localhost:6688/api/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### get user list
+GET http://localhost:6688/api/users
 Authorization: Bearer {{token}}
 Content-Type: application/json
