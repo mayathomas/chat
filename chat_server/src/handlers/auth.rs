@@ -44,11 +44,15 @@ pub(crate) async fn signin_handler(
 
 #[cfg(test)]
 mod tests {
-    use crate::AppConfig;
+    use crate::{middleware::verify_token, AppConfig};
 
     use super::*;
     use anyhow::Result;
+    use axum::{
+        body::Body, extract::Request, middleware::from_fn_with_state, routing::get, Router,
+    };
     use http_body_util::BodyExt;
+    use tower::ServiceExt;
 
     #[tokio::test]
     async fn signup_should_work() -> Result<()> {
@@ -85,6 +89,45 @@ mod tests {
         let body = ret.into_body().collect().await?.to_bytes();
         let ret: AuthOutput = serde_json::from_slice(&body)?;
         assert_ne!(ret.token, "");
+        Ok(())
+    }
+
+    async fn handler(_req: Request) -> impl IntoResponse {
+        (StatusCode::OK, "Ok")
+    }
+
+    #[tokio::test]
+    async fn verify_token_middleware_should_work() -> Result<()> {
+        let config = AppConfig::load()?;
+        let (_tdb, state) = AppState::new_for_test(config).await?;
+        let app: Router = Router::new()
+            .route("/", get(handler))
+            .layer(from_fn_with_state(state.clone(), verify_token))
+            .with_state(state.clone());
+
+        let user = User::new(1, "maya", "maya@qq.com");
+        let token = state.ek.sign(user)?;
+
+        // good token
+        let req = Request::builder()
+            .uri("/")
+            .header("Authorization", format!("Bearer {}", token))
+            .body(Body::empty())?;
+        let res = app.clone().oneshot(req).await?;
+        assert_eq!(res.status(), StatusCode::OK);
+
+        // no token
+        let req = Request::builder().uri("/").body(Body::empty())?;
+        let res = app.clone().oneshot(req).await?;
+        assert_eq!(res.status(), StatusCode::UNAUTHORIZED);
+
+        // bad token
+        let req = Request::builder()
+            .uri("/")
+            .header("Authorization", "Bearer badtoken")
+            .body(Body::empty())?;
+        let res = app.oneshot(req).await?;
+        assert_eq!(res.status(), StatusCode::UNAUTHORIZED);
         Ok(())
     }
 }
