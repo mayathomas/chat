@@ -12,7 +12,6 @@ use tracing::warn;
 
 use crate::AppState;
 
-#[allow(dead_code)]
 pub async fn verify_token(State(state): State<AppState>, req: Request, next: Next) -> Response {
     let (mut parts, body) = req.into_parts();
     let token = TypedHeader::<Authorization<Bearer>>::from_request_parts(&mut parts, &state).await;

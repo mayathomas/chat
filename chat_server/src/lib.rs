@@ -9,6 +9,7 @@ use std::{fmt, ops::Deref, sync::Arc};
 
 use anyhow::Context;
 use axum::{
+    middleware::from_fn_with_state,
     routing::{get, patch, post},
     Router,
 };
@@ -19,7 +20,7 @@ use handlers::{
     list_message_handler, send_message_handler, signin_handler, signup_handler,
     update_chat_handler,
 };
-use middleware::set_layer;
+use middleware::{set_layer, verify_token};
 pub use models::User;
 use sqlx::PgPool;
 
@@ -74,8 +75,6 @@ pub async fn get_router(config: AppConfig) -> Result<Router, AppError> {
     let state = AppState::try_new(config).await?;
 
     let api = Router::new()
-        .route("/signin", post(signin_handler))
-        .route("/signup", post(signup_handler))
         .route("/chat", get(list_chat_handler).post(create_chat_handler))
         .route(
             "/chat/:id",
@@ -83,7 +82,11 @@ pub async fn get_router(config: AppConfig) -> Result<Router, AppError> {
                 .delete(delete_chat_handler)
                 .post(send_message_handler),
         )
-        .route("/chat/:id/messages", get(list_message_handler));
+        .route("/chat/:id/messages", get(list_message_handler))
+        .layer(from_fn_with_state(state.clone(), verify_token))
+        // routes doesn't need token verification
+        .route("/signin", post(signin_handler))
+        .route("/signup", post(signup_handler));
 
     let app = Router::new()
         .route("/", get(index_handler))

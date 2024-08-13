@@ -26,14 +26,13 @@ impl DecodingKey {
     pub fn load(pem: &str) -> Result<Self, AppError> {
         Ok(Self(Ed25519PublicKey::from_pem(pem)?))
     }
-    #[allow(unused)]
     pub fn verify(&self, token: &str) -> Result<User, AppError> {
         let opts = VerificationOptions {
             allowed_issuers: Some(HashSet::from_strings(&[JWT_ISSUER])),
             allowed_audiences: Some(HashSet::from_strings(&[JWT_AUD])),
             ..Default::default()
         };
-        let claims = self.0.verify_token::<User>(token, None)?;
+        let claims = self.0.verify_token::<User>(token, Some(opts))?;
         Ok(claims.custom)
     }
 }

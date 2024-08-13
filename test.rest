@@ -9,6 +9,7 @@ Content-Type: application/json
 }
 
 ### signin user(valid)
+# @name signin
 POST http://localhost:6688/api/signin
 Content-Type: application/json
 
@@ -16,6 +17,7 @@ Content-Type: application/json
     "email": "maya@qq.com",
     "password": "2713"
 }
+
 
 
 ### signin user(invalid)
@@ -26,3 +28,9 @@ Content-Type: application/json
     "email": "maya1@qq.com",
     "password": "2713"
 }
+
+### get chat list
+@token = {{signin.response.body.token}}
+GET http://localhost:6688/api/chat
+Authorization: Bearer {{token}}
+Content-Type: application/json
