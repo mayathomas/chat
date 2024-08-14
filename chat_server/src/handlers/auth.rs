@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     models::{CreateUser, SigninUser},
-    AppError, AppState, ErrorOutput, User,
+    AppError, AppState, ErrorOutput,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,7 +15,7 @@ pub(crate) async fn signup_handler(
     State(state): State<AppState>,
     Json(input): Json<CreateUser>,
 ) -> Result<impl IntoResponse, AppError> {
-    let user = User::create(&input, &state.pool).await?;
+    let user = state.create_user(&input).await?;
     let token = state.ek.sign(user)?;
     // let mut header = HeaderMap::new();
     // header.insert("X-Token", token.parse()?);
@@ -28,7 +28,7 @@ pub(crate) async fn signin_handler(
     State(state): State<AppState>,
     Json(input): Json<SigninUser>,
 ) -> Result<impl IntoResponse, AppError> {
-    let user = User::verify(&input, &state.pool).await?;
+    let user = state.verify_user(&input).await?;
     match user {
         Some(user) => {
             let token = state.ek.sign(user)?;
@@ -44,7 +44,7 @@ pub(crate) async fn signin_handler(
 
 #[cfg(test)]
 mod tests {
-    use crate::{middleware::verify_token, AppConfig};
+    use crate::{middleware::verify_token, User};
 
     use super::*;
     use anyhow::Result;
@@ -56,8 +56,7 @@ mod tests {
 
     #[tokio::test]
     async fn signup_should_work() -> Result<()> {
-        let config = AppConfig::load()?;
-        let (_tdb, state) = AppState::new_for_test(config).await?;
+        let (_tdb, state) = AppState::new_for_test().await?;
         let input = CreateUser::new("none", "maya", "maya@qq.com", "2713");
         let ret = signup_handler(State(state), Json(input))
             .await?
@@ -72,14 +71,13 @@ mod tests {
 
     #[tokio::test]
     async fn signin_should_work() -> Result<()> {
-        let config = AppConfig::load()?;
-        let (_tdb, state) = AppState::new_for_test(config).await?;
+        let (_tdb, state) = AppState::new_for_test().await?;
 
         let name = "maya";
         let email = "maya@qq.com";
         let password = "2713";
         let user = CreateUser::new("none", name, email, password);
-        User::create(&user, &state.pool).await?;
+        state.create_user(&user).await?;
 
         let input = SigninUser::new(email, password);
         let ret = signin_handler(State(state), Json(input))
@@ -98,8 +96,7 @@ mod tests {
 
     #[tokio::test]
     async fn verify_token_middleware_should_work() -> Result<()> {
-        let config = AppConfig::load()?;
-        let (_tdb, state) = AppState::new_for_test(config).await?;
+        let (_tdb, state) = AppState::new_for_test().await?;
         let app: Router = Router::new()
             .route("/", get(handler))
             .layer(from_fn_with_state(state.clone(), verify_token))
