@@ -19,6 +19,12 @@ pub enum AppError {
     #[error("create chat error: {0}")]
     CreateChatError(String),
 
+    #[error("create message error: {0}")]
+    CreateMessageError(String),
+
+    #[error("{0}")]
+    ChatFileError(String),
+
     #[error("io error: {0}")]
     IoError(#[from] std::io::Error),
 
@@ -55,8 +61,10 @@ impl IntoResponse for AppError {
             AppError::InvalidHeaderValue(_) => axum::http::StatusCode::UNPROCESSABLE_ENTITY,
             AppError::EmailAlreadyExists(_) => axum::http::StatusCode::CONFLICT,
             AppError::CreateChatError(_) => axum::http::StatusCode::BAD_REQUEST,
+            AppError::CreateMessageError(_) => axum::http::StatusCode::BAD_REQUEST,
             AppError::NotFound(_) => axum::http::StatusCode::NOT_FOUND,
             AppError::IoError(_) => axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::ChatFileError(_) => axum::http::StatusCode::BAD_REQUEST,
         };
         (status, Json(json!(ErrorOutput::new(self.to_string())))).into_response()
     }
