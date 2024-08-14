@@ -1,4 +1,5 @@
 mod chat;
+mod file;
 mod user;
 mod workspace;
 
@@ -52,6 +53,12 @@ pub struct Chat {
     pub r#type: ChatType,
     pub members: Vec<i64>,
     pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChatFile {
+    pub ext: String,
+    pub hash: String,
 }
 
 #[cfg(test)]

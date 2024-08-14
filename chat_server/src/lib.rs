@@ -16,15 +16,16 @@ use axum::{
 pub use config::AppConfig;
 pub use error::{AppError, ErrorOutput};
 use handlers::{
-    create_chat_handler, delete_chat_handler, get_chat_handler, index_handler, list_chat_handler,
-    list_chat_users_handler, list_message_handler, send_message_handler, signin_handler,
-    signup_handler, update_chat_handler,
+    create_chat_handler, delete_chat_handler, file_handler, get_chat_handler, index_handler,
+    list_chat_handler, list_chat_users_handler, list_message_handler, send_message_handler,
+    signin_handler, signup_handler, update_chat_handler, upload_handler,
 };
 use middleware::{set_layer, verify_token};
 pub use models::User;
 pub use models::*;
 use sqlx::PgPool;
 
+use tokio::fs;
 use utils::{DecodingKey, EncodingKey};
 
 #[derive(Debug, Clone)]
@@ -50,6 +51,9 @@ impl Deref for AppState {
 
 impl AppState {
     pub async fn try_new(config: AppConfig) -> Result<Self, AppError> {
+        fs::create_dir_all(&config.server.base_dir)
+            .await
+            .context("create base_dir failed")?;
         let ek = EncodingKey::load(&config.auth.sk).context("load sk failed")?;
         let dk = DecodingKey::load(&config.auth.pk).context("load pk failed")?;
         let pool = PgPool::connect(&config.server.db_url).await?;
@@ -86,6 +90,8 @@ pub async fn get_router(config: AppConfig) -> Result<Router, AppError> {
                 .post(send_message_handler),
         )
         .route("/chats/:id/messages", get(list_message_handler))
+        .route("/upload", post(upload_handler))
+        .route("/files/:ws_id/*path", get(file_handler))
         .layer(from_fn_with_state(state.clone(), verify_token))
         // routes doesn't need token verification
         .route("/signin", post(signin_handler))

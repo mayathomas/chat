@@ -1,5 +1,5 @@
 use anyhow::{bail, Result};
-use std::fs::File;
+use std::{fs::File, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 
@@ -14,6 +14,7 @@ pub struct ServerConfig {
     pub host: String,
     pub port: u16,
     pub db_url: String,
+    pub base_dir: PathBuf,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

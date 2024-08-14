@@ -63,3 +63,24 @@ Content-Type: application/json
 GET http://localhost:6688/api/users
 Authorization: Bearer {{token}}
 Content-Type: application/json
+
+
+### upload files
+POST http://localhost:6688/api/upload
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=MyBoundary
+
+--MyBoundary
+Content-Disposition: form-data; filename="OIP.png"
+Content-Type: application/octet-stream
+
+< /home/maya/Pictures/OIP.jpeg
+--MyBoundary
+Content-Disposition: form-data; filename="hello.txt"
+
+hello world
+--MyBoundary--
+
+### get files
+GET http://localhost:6688/api/files/1/34b/27d/f4302d2481ebbe1ba4e1764e0652606820.png
+Authorization: Bearer {{token}}

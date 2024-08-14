@@ -19,6 +19,9 @@ pub enum AppError {
     #[error("create chat error: {0}")]
     CreateChatError(String),
 
+    #[error("io error: {0}")]
+    IoError(#[from] std::io::Error),
+
     #[error("sql error: {0}")]
     SqlxError(#[from] sqlx::Error),
 
@@ -53,6 +56,7 @@ impl IntoResponse for AppError {
             AppError::EmailAlreadyExists(_) => axum::http::StatusCode::CONFLICT,
             AppError::CreateChatError(_) => axum::http::StatusCode::BAD_REQUEST,
             AppError::NotFound(_) => axum::http::StatusCode::NOT_FOUND,
+            AppError::IoError(_) => axum::http::StatusCode::INTERNAL_SERVER_ERROR,
         };
         (status, Json(json!(ErrorOutput::new(self.to_string())))).into_response()
     }
