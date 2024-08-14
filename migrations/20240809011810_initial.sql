@@ -17,9 +17,9 @@ CREATE TYPE chat_type AS ENUM (
     'public_channel'
 );
 -- create chat table
-CREATE TABLE IF NOT EXISTS chat(
+CREATE TABLE IF NOT EXISTS chats(
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(128) NOT NULL,
+    name VARCHAR(64),
     type chat_type NOT NULL,
     -- user id list
     members BIGINT [] NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS chat(
 -- create message table
 CREATE TABLE IF NOT EXISTS messages(
     id BIGSERIAL PRIMARY KEY,
-    chat_id BIGINT NOT NULL REFERENCES chat(id),
+    chat_id BIGINT NOT NULL REFERENCES chats(id),
     sender_id BIGINT NOT NULL REFERENCES users(id),
     content TEXT NOT NULL,
     images TEXT [],
@@ -37,4 +37,4 @@ CREATE TABLE IF NOT EXISTS messages(
 -- create index for messages for chat_id and create_at order by create_at desc
 CREATE INDEX IF NOT EXISTS chat_id_created_at_idx ON messages(chat_id, created_at DESC);
 -- create index for messages for sender_id
-CREATE INDEX IF NOT EXISTS sender_id_idx ON messages(sender_id);
+CREATE INDEX IF NOT EXISTS sender_id_idx ON messages(sender_id, created_at DESC);
