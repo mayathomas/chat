@@ -42,3 +42,50 @@ pub(crate) async fn update_chat_handler() -> &'static str {
 pub(crate) async fn delete_chat_handler() -> &'static str {
     "Hello, World!"
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::middleware::{verify_chat, verify_token};
+
+    use super::*;
+    use anyhow::Result;
+    use axum::{
+        body::Body, extract::Request, middleware::from_fn_with_state, routing::get, Router,
+    };
+    use tower::ServiceExt;
+
+    async fn handler(_req: Request) -> impl IntoResponse {
+        (StatusCode::OK, "Ok")
+    }
+
+    #[tokio::test]
+    async fn verify_chat_middleware_should_work() -> Result<()> {
+        let (_tdb, state) = AppState::new_for_test().await?;
+        let app: Router = Router::new()
+            .route("/chat/:id/messages", get(handler))
+            .layer(from_fn_with_state(state.clone(), verify_chat))
+            .layer(from_fn_with_state(state.clone(), verify_token))
+            .with_state(state.clone());
+
+        let user = state.find_user_by_id(1).await?.expect("user should exist");
+        let token = state.ek.sign(user)?;
+
+        // user in chat
+        let req = Request::builder()
+            .uri("/chat/1/messages")
+            .header("Authorization", format!("Bearer {}", token))
+            .body(Body::empty())?;
+        let res = app.clone().oneshot(req).await?;
+        assert_eq!(res.status(), StatusCode::OK);
+
+        // user not in chat
+        let req = Request::builder()
+            .uri("/chat/5/messages")
+            .header("Authorization", format!("Bearer {}", token))
+            .body(Body::empty())?;
+        let res = app.oneshot(req).await?;
+        assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+
+        Ok(())
+    }
+}

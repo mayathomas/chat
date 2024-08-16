@@ -36,6 +36,19 @@ impl AppState {
         Ok(user)
     }
 
+    #[allow(dead_code)]
+    // find user by id
+    pub async fn find_user_by_id(&self, id: u64) -> Result<Option<User>, AppError> {
+        let user = sqlx::query_as(
+            "SELECT id, ws_id, fullname, email, created_at FROM users WHERE id = $1",
+        )
+        .bind(id as i64)
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(user)
+    }
+
     // create a new user
     pub async fn create_user(&self, input: &CreateUser) -> Result<User, AppError> {
         let user = &self.find_user_by_email(&input.email).await?;
@@ -204,6 +217,16 @@ mod tests {
             }
             _ => panic!("Expecting EmailAlreadyExists error"),
         }
+        Ok(())
+    }
+
+    #[tokio::test]
+    async fn find_user_by_id_should_work() -> Result<()> {
+        let (_tdb, state) = AppState::new_for_test().await?;
+        let user = state.find_user_by_id(1).await?;
+        assert!(user.is_some());
+        let user = user.unwrap();
+        assert_eq!(user.id, 1);
         Ok(())
     }
 }
