@@ -44,13 +44,13 @@ pub(crate) async fn signin_handler(
 
 #[cfg(test)]
 mod tests {
-    use crate::{middleware::verify_token, User};
 
     use super::*;
     use anyhow::Result;
     use axum::{
         body::Body, extract::Request, middleware::from_fn_with_state, routing::get, Router,
     };
+    use chat_core::{middleware::verify_token, User};
     use http_body_util::BodyExt;
     use tower::ServiceExt;
 
@@ -99,7 +99,7 @@ mod tests {
         let (_tdb, state) = AppState::new_for_test().await?;
         let app: Router = Router::new()
             .route("/", get(handler))
-            .layer(from_fn_with_state(state.clone(), verify_token))
+            .layer(from_fn_with_state(state.clone(), verify_token::<AppState>))
             .with_state(state.clone());
 
         let user = User::new(1, "maya", "maya@qq.com");

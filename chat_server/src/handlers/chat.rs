@@ -5,7 +5,8 @@ use axum::{
     Extension, Json,
 };
 
-use crate::{AppError, AppState, CreateChat, User};
+use crate::{AppError, AppState, CreateChat};
+use chat_core::User;
 
 pub(crate) async fn list_chat_handler(
     Extension(user): Extension<User>,
@@ -45,13 +46,14 @@ pub(crate) async fn delete_chat_handler() -> &'static str {
 
 #[cfg(test)]
 mod tests {
-    use crate::middleware::{verify_chat, verify_token};
+    use crate::middleware::verify_chat;
 
     use super::*;
     use anyhow::Result;
     use axum::{
         body::Body, extract::Request, middleware::from_fn_with_state, routing::get, Router,
     };
+    use chat_core::middleware::verify_token;
     use tower::ServiceExt;
 
     async fn handler(_req: Request) -> impl IntoResponse {
@@ -64,7 +66,7 @@ mod tests {
         let app: Router = Router::new()
             .route("/chat/:id/messages", get(handler))
             .layer(from_fn_with_state(state.clone(), verify_chat))
-            .layer(from_fn_with_state(state.clone(), verify_token))
+            .layer(from_fn_with_state(state.clone(), verify_token::<AppState>))
             .with_state(state.clone());
 
         let user = state.find_user_by_id(1).await?.expect("user should exist");
