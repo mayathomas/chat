@@ -12,7 +12,8 @@
     <h1>Server sent event</h1>
 
     <script lang="javascript">
-        var source = new EventSource("events");
+        let token = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjQ2NjA5MzEsImV4cCI6MTcyNTI2NTczMSwibmJmIjoxNzI0NjYwOTMxLCJpc3MiOiJjaGF0X3NlcnZlciIsImF1ZCI6ImNoYXRfd2ViIiwiaWQiOjEsIndzX2lkIjoxLCJmdWxsbmFtZSI6Im1heWEiLCJlbWFpbCI6Im1heWFAcXEuY29tIiwiY3JlYXRlZF9hdCI6IjIwMjQtMDgtMjZUMDc6Mjg6NTkuODc0NzEyWiJ9.gt4aBMhI6U70rt4hTc7y4FJjdWgG9l3q2wwr9uMHEUUiXE7Qc517tOJVuYcE242_yZqFyFvXVg7qGNjRt8BpDQ";
+        let source = new EventSource(`/events?access_token=${token}`);
         source.onmessage = function (event) {
             console.log("Got: ", event.data);
         };
