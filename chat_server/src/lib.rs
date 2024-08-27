@@ -3,6 +3,7 @@ mod error;
 mod handlers;
 mod middleware;
 mod models;
+mod openapi;
 
 use std::{fmt, ops::Deref, sync::Arc};
 
@@ -26,6 +27,7 @@ use handlers::{
 };
 use middleware::verify_chat;
 pub use models::*;
+use openapi::OpenApiRouter;
 use sqlx::PgPool;
 use tokio::fs;
 
@@ -108,6 +110,7 @@ pub async fn get_router(state: AppState) -> Result<Router, AppError> {
         .route("/signup", post(signup_handler));
 
     let app = Router::new()
+        .openapi()
         .route("/", get(index_handler))
         .nest("/api", api)
         .with_state(state);

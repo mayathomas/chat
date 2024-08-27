@@ -5,8 +5,9 @@ use axum::{
 use jwt_simple::reexports::serde_json::json;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+use utoipa::ToSchema;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct ErrorOutput {
     pub error: String,
 }

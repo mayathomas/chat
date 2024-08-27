@@ -21,6 +21,21 @@ pub(crate) async fn send_message_handler(
     Ok(Json(msg))
 }
 
+#[utoipa::path(
+    get,
+    path = "/api/chats/{id}/messages",
+    params(
+        ("id" = u64, Path, description = "Chat id"),
+        ListMessages
+    ),
+    responses(
+        (status = 200, description = "List of message", body = Vec<Message>),
+        (status = 400, description = "Invalid input", body = ErrorOutput)
+    ),
+    security(
+        ("token" = [])
+    )
+)]
 pub(crate) async fn list_message_handler(
     State(state): State<AppState>,
     Path(id): Path<u64>,
