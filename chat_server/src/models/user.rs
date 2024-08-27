@@ -187,7 +187,7 @@ mod tests {
     async fn create_and_verify_user_should_work() -> Result<()> {
         let (_tdb, state) = AppState::new_for_test().await?;
 
-        let input = CreateUser::new("none", "maya", "maya@qq.com", "2713");
+        let input = CreateUser::new("none", "maya", "maya@163.com", "2713");
         let user = state.create_user(&input).await?;
         assert_eq!(user.email, input.email);
         assert_eq!(user.fullname, input.fullname);
@@ -210,7 +210,7 @@ mod tests {
     async fn create_duplicate_user_should_fail() -> Result<()> {
         let (_tdb, state) = AppState::new_for_test().await?;
 
-        let input = CreateUser::new("acme", "maya acme", "maya@acme.com", "2713");
+        let input = CreateUser::new("acme", "maya acme", "maya@qq.com", "2713");
         let ret = state.create_user(&input).await;
         match ret {
             Err(AppError::EmailAlreadyExists(email)) => {

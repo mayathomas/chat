@@ -52,7 +52,7 @@ mod tests {
     #[tokio::test]
     async fn signup_should_work() -> Result<()> {
         let (_tdb, state) = AppState::new_for_test().await?;
-        let input = CreateUser::new("none", "maya", "maya@qq.com", "2713");
+        let input = CreateUser::new("none", "maya", "maya@163.com", "2713");
         let ret = signup_handler(State(state), Json(input))
             .await?
             .into_response();
@@ -69,7 +69,7 @@ mod tests {
         let (_tdb, state) = AppState::new_for_test().await?;
 
         let name = "maya";
-        let email = "maya@qq.com";
+        let email = "maya@163.com";
         let password = "2713";
         let user = CreateUser::new("none", name, email, password);
         state.create_user(&user).await?;

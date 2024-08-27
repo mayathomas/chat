@@ -11,7 +11,6 @@ pub struct CreateChat {
     pub public: bool,
 }
 
-#[allow(dead_code)]
 impl AppState {
     pub async fn create_chat(&self, input: CreateChat, ws_id: u64) -> Result<Chat, AppError> {
         let len = input.members.len();

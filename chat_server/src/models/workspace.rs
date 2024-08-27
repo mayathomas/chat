@@ -61,7 +61,7 @@ mod tests {
         let (_tdb, state) = AppState::new_for_test().await?;
         let ws = &state.create_workspace("test", 0).await?;
         assert_eq!(ws.name, "test");
-        let input = CreateUser::new(&ws.name, "maya qq", "maya@qq.com", "2713");
+        let input = CreateUser::new(&ws.name, "maya qq", "maya@163.com", "2713");
         let user = state.create_user(&input).await?;
         assert_eq!(user.ws_id, ws.id);
         let ws = state

@@ -7,33 +7,33 @@ VALUES ('acme', '0'),
 INSERT INTO users (ws_id, email, fullname, password_hash)
 VALUES (
         1,
-        'maya@acme.com',
-        'maya acme',
-        '$argon2id$v=19$m=19456,t=2,p=1$FUXMnKyerjElJpX0WduyWw$YKU5sPf2jvWY2p6tapH5M6nc2d8uSawMZn3pR9UBAuc'
+        'maya@qq.com',
+        'maya thomas',
+        '$argon2id$v=19$m=19456,t=2,p=1$f6NhdwtywoY/8TTM1VcOJA$+IElCgu1wL31bEz+hA7Hg1vf7qLR3YL10vqD8Paw9Vo'
     ),
     (
         1,
         'alice@acme.com',
         'alice acme',
-        '$argon2id$v=19$m=19456,t=2,p=1$FUXMnKyerjElJpX0WduyWw$YKU5sPf2jvWY2p6tapH5M6nc2d8uSawMZn3pR9UBAuc'
+        '$argon2id$v=19$m=19456,t=2,p=1$f6NhdwtywoY/8TTM1VcOJA$+IElCgu1wL31bEz+hA7Hg1vf7qLR3YL10vqD8Paw9Vo'
     ),
     (
         1,
         'bob@acme.com',
         'bob acme',
-        '$argon2id$v=19$m=19456,t=2,p=1$FUXMnKyerjElJpX0WduyWw$YKU5sPf2jvWY2p6tapH5M6nc2d8uSawMZn3pR9UBAuc'
+        '$argon2id$v=19$m=19456,t=2,p=1$f6NhdwtywoY/8TTM1VcOJA$+IElCgu1wL31bEz+hA7Hg1vf7qLR3YL10vqD8Paw9Vo'
     ),
     (
         1,
         'charlie@acme.com',
         'charlie acme',
-        '$argon2id$v=19$m=19456,t=2,p=1$FUXMnKyerjElJpX0WduyWw$YKU5sPf2jvWY2p6tapH5M6nc2d8uSawMZn3pR9UBAuc'
+        '$argon2id$v=19$m=19456,t=2,p=1$f6NhdwtywoY/8TTM1VcOJA$+IElCgu1wL31bEz+hA7Hg1vf7qLR3YL10vqD8Paw9Vo'
     ),
     (
         1,
         'daisy@acme.com',
         'daisy acme',
-        '$argon2id$v=19$m=19456,t=2,p=1$FUXMnKyerjElJpX0WduyWw$YKU5sPf2jvWY2p6tapH5M6nc2d8uSawMZn3pR9UBAuc'
+        '$argon2id$v=19$m=19456,t=2,p=1$f6NhdwtywoY/8TTM1VcOJA$+IElCgu1wL31bEz+hA7Hg1vf7qLR3YL10vqD8Paw9Vo'
     );
 -- insert 4 chats
 -- insert public/private channel
